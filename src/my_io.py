@@ -1,5 +1,6 @@
 import torchvision
 from torch import Tensor, load, float32
+import numpy as np
 
 
 def __load_image__(path: str, mode: torchvision.io.ImageReadMode) -> Tensor:
@@ -67,7 +68,7 @@ def load_serialized_image(path: str, is_mask=False, normalize=True) -> Tensor:
     return img
 
 
-def print_image(img: ndarray, file_name: str | None):
+def print_image(img: np.ndarray, file_name: str | None):
     if file_name is None:
         import matplotlib.pyplot as plt
 
