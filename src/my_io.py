@@ -15,7 +15,7 @@ def __load_image__(path: str, mode: torchvision.io.ImageReadMode) -> Tensor:
     Returns:
         torch.Tensor: Normalized image tensor with values in [0,1]
     """
-    return torchvision.io.decode_image(path, mode) / 255
+    return torchvision.io.read_image(path, mode) / 255
 
 
 def load_rgb_image(path: str) -> Tensor:
