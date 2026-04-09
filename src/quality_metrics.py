@@ -1,6 +1,14 @@
-from torch import Tensor
-import torch
 import numpy as np
+
+try:
+    import torch
+    from torch import Tensor
+    import torch.nn.functional as F
+except ImportError:
+    torch = None
+
+    class Tensor:
+        pass
 
 
 def psnr_with_mask(
@@ -31,10 +39,6 @@ def psnr_with_mask(
         return 10 * torch.log10(data_range**2 / mse)
     else:
         return 10 * np.log10(data_range**2 / mse)
-
-
-import torch
-import torch.nn.functional as F
 
 
 # Ensure shape is (1, 1, H, W)
