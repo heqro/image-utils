@@ -2,6 +2,7 @@ import torch
 from torch import Tensor
 import torch.nn.functional as F
 
+
 def roberts(image: Tensor):
     """
     Applies Roberts cross edge detection operator to an input image.
@@ -224,7 +225,7 @@ def derivative7(image: Tensor):
     return dx, dy
 
 
-def anscombe_transform(x: torch.Tensor, sigma: float):
+def anscombe_transform(x: Tensor, sigma: float):
     """
     Applies the Anscombe transform to stabilize variance in noisy image data.
 
@@ -236,3 +237,28 @@ def anscombe_transform(x: torch.Tensor, sigma: float):
         torch.Tensor: Transformed tensor with stabilized variance
     """
     return torch.sqrt(torch.clip(x**2 - sigma**2, 0))
+
+
+def elliptical_shutter(k_space: Tensor, cutoff_ratio: float) -> tuple[Tensor, Tensor]:
+    """
+    Applies an elliptical low-pass filter to a centered k-space tensor.
+
+    Args:
+        k_space (torch.Tensor): Complex k-space data.
+        cutoff_ratio (float): The radius of the shutter. 1.0 touches the edges;
+                              0.5 keeps the central half of frequencies.
+
+    Returns:
+        torch.Tensor: The truncated k-space.
+    """
+    H, W = k_space.shape[-2:]
+    Y, X = torch.meshgrid(
+        torch.linspace(-1, 1, H, device=k_space.device),
+        torch.linspace(-1, 1, W, device=k_space.device),
+        indexing="ij",
+    )
+    distance_squared = (X**2) + (Y**2)
+    mask = distance_squared <= (cutoff_ratio**2)
+    k_space_truncated = k_space * mask.to(k_space.dtype)
+
+    return k_space_truncated, mask
