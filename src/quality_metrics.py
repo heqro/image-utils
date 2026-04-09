@@ -87,3 +87,30 @@ def compute_cnr_torch(img: Tensor, mask: Tensor):
 
     cnr = torch.abs(mu1 - mu2) / (sigma_bkg * 1.53 + 1e-8)
     return cnr.item()
+
+
+def ssim_with_mask(
+    denoised: np.ndarray,
+    gt: np.ndarray,
+    mask: np.ndarray,
+    bbox: tuple[tuple[int, int], tuple[int, int]],
+):
+    from skimage.metrics import structural_similarity
+
+    den_roi = (denoised * mask)[
+        ...,
+        bbox[0][0] : bbox[1][0],
+        bbox[0][1] : bbox[1][1],
+    ]
+    gt_roi = (gt * mask)[
+        ...,
+        bbox[0][0] : bbox[1][0],
+        bbox[0][1] : bbox[1][1],
+    ]
+    res = structural_similarity(
+        den_roi.squeeze(),
+        gt_roi.squeeze(),
+        data_range=1.0,
+        channel_axis=0,
+    )
+    return res
